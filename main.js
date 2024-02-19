@@ -75,7 +75,7 @@ function main() {
                 'sender_id': json.sender_id,
                 'name': json.name,
                 'message': json.message,
-                'date': json.message
+                'date': json.date
             }
 
             // send message to all sockets
