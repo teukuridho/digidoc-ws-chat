@@ -49,6 +49,14 @@ function main() {
         // push to sockets list
         sockets.push(socket);
 
+        // handles disconenct
+        socket.on("close", () => {
+            const index = sockets.indexOf(socket)
+            if(index > -1) {
+                sockets.splice(index, 1)
+            }
+        })
+
         // handles error
         socket.on("error", (error) => {
             console.log(error)
