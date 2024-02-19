@@ -1,5 +1,6 @@
 const { configDotenv } = require("dotenv");
-const { createServer } = require('https');
+const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const { WebSocket, WebSocketServer } = require('ws');
 const express = require('express');
@@ -17,24 +18,30 @@ function main() {
     // init dot env
     configDotenv();
 
-    // create https server
-    const httpsServer = createServer(
-        {
-            key: process.env.SSL_KEY_PATH ? fs.readFileSync(process.env.SSL_KEY_PATH) : null,
-            cert: process.env.SSL_CERT_PATH ? fs.readFileSync(process.env.SSL_CERT_PATH) : null,
-            ca: process.env.SSL_CA_PATH ? fs.readFileSync(process.env.SSL_CA_PATH) : null,
-        }, 
-        app
-    )
+    // create http server
+    var httpServer;
+    if(process.env.IS_SECURE == "true") {
+        httpServer = https.createServer(
+            {
+                key: process.env.SSL_KEY_PATH ? fs.readFileSync(process.env.SSL_KEY_PATH) : null,
+                cert: process.env.SSL_CERT_PATH ? fs.readFileSync(process.env.SSL_CERT_PATH) : null,
+                ca: process.env.SSL_CA_PATH ? fs.readFileSync(process.env.SSL_CA_PATH) : null,
+            }, 
+            app
+        )
+    }
+    else {
+        httpServer = http.createServer(app)
+    }
 
     // listens https server
-    httpsServer.listen(process.env.PORT, () => {
-        console.log(`HTTPS Started on ${process.env.PORT}`)
+    httpServer.listen(process.env.PORT, () => {
+        console.log(`HTTP${process.env.IS_SECURE == "true" ? '(S)' : ''} Started on ${process.env.PORT}`)
     });
 
     // create websocket server
     const wss = new WebSocketServer({
-        server: httpsServer
+        server: httpServer
     });
 
     // handles on connection
