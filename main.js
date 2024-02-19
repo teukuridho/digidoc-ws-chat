@@ -49,12 +49,17 @@ function main() {
         // push to sockets list
         sockets.push(socket);
 
-        // handles disconenct
-        socket.on("close", () => {
+        // removes socket if disconnects
+        const removeSocket = () => {
             const index = sockets.indexOf(socket)
             if(index > -1) {
                 sockets.splice(index, 1)
             }
+        }
+
+        // handles disconenct
+        socket.on("close", () => {
+            removeSocket();
         })
 
         // handles error
