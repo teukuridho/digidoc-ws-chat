@@ -98,6 +98,13 @@ function main() {
             
         })
     })
+
+    // pings every sockets
+    setInterval(() => {
+        for(const socket of sockets) {
+            socket.send(JSON.stringify({}));
+        }
+    }, 30000)
 }
 
 // executes entry point
